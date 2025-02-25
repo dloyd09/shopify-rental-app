@@ -44,6 +44,8 @@ router.post("/", async (req, res) => {
             specialRequests
         });
 
+        //update
+
         await newRental.save();
         console.log("✅ Rental successfully saved:", newRental);
         res.status(201).json({ message: "Rental request submitted successfully", rental: newRental });
