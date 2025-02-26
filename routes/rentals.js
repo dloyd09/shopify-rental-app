@@ -9,7 +9,7 @@ router.post("/", async (req, res) => {
     try {
         console.log("📩 Incoming Rental Request:", req.body); // ✅ Log incoming data
 
-        const { customerId, rentalStart, rentalEnd, skiLength, bootSize, skillLevel, specialRequests } = req.body;
+        const { shopifyCustomerId, rentalStart, rentalEnd, renters } = req.body;
 
         // ✅ Check if rentalStart and rentalEnd are valid
         if (!rentalStart || !rentalEnd) {
@@ -17,31 +17,18 @@ router.post("/", async (req, res) => {
             return res.status(400).json({ message: "Rental start and end dates are required" });
         }
 
-        // ✅ Check if customerId is provided
-        if (!customerId) {
-            console.error("❌ Missing Shopify Customer ID");
-            return res.status(400).json({ message: "Shopify Customer ID is required" });
+        if (!shopifyCustomerId || !renters || renters.length === 0) {
+            return res.status(400).json({ message: "Shopify customer ID and at least one renter are required." });
         }
 
-        // ✅ Lookup MongoDB customer by `shopifyCustomerId`
-        const existingCustomer = await Customer.findOne({ shopifyCustomerId: customerId });
+        console.log(`📩 Creating rental for Shopify Customer ID: ${shopifyCustomerId}`);     
 
-        if (!existingCustomer) {
-            console.error("❌ Customer not found in MongoDB for Shopify ID:", customerId);
-            return res.status(400).json({ message: "Customer not found in database." });
-        }
-
-        console.log("✅ Found MongoDB Customer:", existingCustomer.shopifyCustomerId);
-
-        // ✅ Create the rental record
+        // ✅ Create new rental document with renter details
         const newRental = new Rental({
-            shopifyCustomerId: existingCustomer.shopifyCustomerId,
+            shopifyCustomerId,
             rentalStart,
             rentalEnd,
-            skiLength,
-            bootSize,
-            skillLevel,
-            specialRequests
+            renters
         });
 
         //update

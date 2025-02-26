@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Page, Form, FormLayout, TextField, Select, Button, Card, DatePicker } from "@shopify/polaris";
+import { Page, Form, FormLayout, TextField, Select, Button, Card, DatePicker, ButtonGroup } from "@shopify/polaris";
 
 export default function HomePage() {
     console.log("🏂 Rental Form Loaded!");
@@ -10,8 +10,11 @@ export default function HomePage() {
     const [skillLevel, setSkillLevel] = useState("Beginner");
     const [specialRequests, setSpecialRequests] = useState("");
     
-    // ✅ Fix: Initialize rentalDate state properly
-    const [rentalDate, setRentalDate] = useState({ start: new Date(), end: new Date() });
+     // ✅ State for DatePicker
+    const today = new Date();
+    const [rentalDate, setRentalDate] = useState({ start: today, end: today });
+    const [month, setMonth] = useState(today.getMonth());
+    const [year, setYear] = useState(today.getFullYear());
 
     // ✅ Fetch Shopify Customer Info
     useEffect(() => {
@@ -40,11 +43,42 @@ export default function HomePage() {
         { label: "Advanced", value: "Advanced" }
     ];
 
-    // ✅ Fix: Define function to handle DatePicker changes
-    const handleDateChange = useCallback((newValue) => {
-        setRentalDate(newValue);
-        console.log("📅 Selected Rental Dates:", newValue);
+    // ✅ Handle DatePicker changes
+    const handleDateChange = useCallback((range) => {
+        console.log("📅 Selected Rental Dates:", range);
+        setRentalDate(range);
     }, []);
+
+    // ✅ Handle Month & Year Navigation
+    const handleMonthChange = useCallback((newMonth, newYear) => {
+        console.log("🔄 Changing Month/Year:", newMonth, newYear);
+        setMonth(newMonth);
+        setYear(newYear);
+    }, []);
+
+    // ✅ Function to navigate previous/next month
+    const goToPreviousMonth = () => {
+        const newMonth = month === 0 ? 11 : month - 1;
+        const newYear = month === 0 ? year - 1 : year;
+        setMonth(newMonth);
+        setYear(newYear);
+    };
+
+    const goToNextMonth = () => {
+        const newMonth = month === 11 ? 0 : month + 1;
+        const newYear = month === 11 ? year + 1 : year;
+        setMonth(newMonth);
+        setYear(newYear);
+    };
+
+    // ✅ Function to display month names instead of numbers
+    const getMonthName = (monthIndex) => {
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+        return monthNames[monthIndex];
+    };
 
     const handleSubmit = async () => {
         if (!customerId) {
@@ -94,12 +128,20 @@ export default function HomePage() {
                         {/* ✅ Read-Only Customer ID (Auto-Filled) */}
                         <TextField label="Customer ID" value={customerId} disabled />
 
-                        {/* ✅ Fix: DatePicker works correctly now */}
+                         {/* ✅ Custom Month & Year Selector */}
+                        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
+                            {/*<Button onClick={goToPreviousMonth}>← Prev</Button>*/}
+                            <h3>{getMonthName(month)}</h3>
+                            {/*<Button onClick={goToNextMonth}>Next →</Button>*/}
+                        </div>
+
+                        {/* ✅ DatePicker with Month & Year Navigation */}
                         <DatePicker
-                            month={rentalDate.start.getMonth()}
-                            year={rentalDate.start.getFullYear()}
+                            month={month}
+                            year={year}
                             selected={rentalDate}
                             onChange={handleDateChange}
+                            onMonthChange={handleMonthChange} // ✅ Allows navigation
                             allowRange
                         />
 
