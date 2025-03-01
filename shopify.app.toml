@@ -1,0 +1,22 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "b65f111f03b4be391f7900c18ee51211"
+application_url = "https://c6e0-66-44-241-88.ngrok-free.app"
+embedded = true
+name = "ski-rentals"
+handle = "ski-rentals"
+
+[build]
+include_config_on_deploy = true
+
+[webhooks]
+api_version = "2025-01"
+
+[auth]
+redirect_urls = [
+  "https://ski-testing.myshopify.com/admin/auth/callback",
+  "https://c6e0-66-44-241-88.ngrok-free.app/auth/callback"
+]
+
+[pos]
+embedded = false

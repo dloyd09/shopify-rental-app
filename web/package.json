@@ -8,6 +8,7 @@
     "start": "vite preview"
   },
   "keywords": [],
+  "type": "module",
   "author": "",
   "license": "ISC",
   "description": "",
